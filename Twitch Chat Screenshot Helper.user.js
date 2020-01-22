@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Click chat msg on twitch, hides name and badges then opens clipping tool
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -44,6 +44,10 @@
 
             username.style.background = username.style.color
             icons.setAttribute('style', `background: ${username.style.color}; padding-top: 15px; height: 0; display: inline-block; overflow: hidden; top: 3px; position: relative;`)
+            chat.setAttribute('style', 'position: absolute; top: 0; width: 100%; background: rgb(24, 24, 27);')
+            if (chat.classList.contains('bttv-split-chat-alt-bg')) {
+                chat.setAttribute('style', 'position: absolute; top: 0; width: 100%; background: rgb(31, 25, 37);')
+            }
 
             setTimeout(() => {
                 let rect = chat.getBoundingClientRect()
@@ -56,6 +60,7 @@
                 setTimeout(() => {
                     username.style.background = 'transparent'
                     icons.removeAttribute('style')
+                    chat.removeAttribute('style')
                 }, 300)
             }, 50)
         }
