@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.
+// @version      0.2
 // @description  Click chat msg on twitch, hides name and badges then opens clipping tool
 // @author       Bred
 // @match        https://*.twitch.tv/*
