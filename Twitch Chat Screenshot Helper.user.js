@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.4.2
+// @version      0.4.3
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -111,11 +111,6 @@
             }
 
             chat_list.prepend(chat)
-
-            let community = document.querySelectorAll('.community-highlight-stack__scroll-area--disable')
-            if (community) {
-                community.setAttribute('style', 'visibility: collapse;')
-            }
 
             setTimeout(() => {
                 let rect = chat.getBoundingClientRect()
