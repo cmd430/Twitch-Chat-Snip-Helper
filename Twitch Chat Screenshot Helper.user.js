@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.4.3
+// @version      0.4.4
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -97,7 +97,11 @@
             let existingStyle = chat.getAttribute('style')
 
             mentions.forEach(mention => {
-                mention.setAttribute('style', 'color: rgb(255, 255, 255); background: rgb(255, 255, 255);')
+                if (mention.classList.contains('mention-fragment--recipient')) {
+                  mention.setAttribute('style', 'color: rgb(255, 255, 255); background: rgb(255, 255, 255);')
+                } else {
+                  mention.setAttribute('style', 'color: rgb(50, 50, 57); background: rgb(50, 50, 57);')
+                }
             })
 
             username.style.background = username.style.color
@@ -107,7 +111,7 @@
                 chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(31, 25, 37); z-index: 100; ${existingStyle}`)
             }
             if (chat.classList.contains('bttv-highlighted')) {
-                chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgba(255, 0, 0, 0.3); z-index: 100; ${existingStyle}`)
+                chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(94, 17, 19); z-index: 100; ${existingStyle}`)
             }
 
             chat_list.prepend(chat)
@@ -122,7 +126,6 @@
 
                 setTimeout(() => {
                     chat.remove()
-                    community.removeAttribute('style')
                 }, 500)
             }, 50)
         }
