@@ -1,27 +1,29 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.4.4
+// @version      0.4.6
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
 // @grant        none
 // ==/UserScript==
 
+
+/*
+    Notes:
+        Press and hold CTRL to disable on click
+        Press and hold Shift to disable Censoring on click
+
+        Add twitch usernames to NOT censor in 'censorExempt' array, usernames should be lowercase
+        Add twitch usernames to NOT censor in mentions in 'mentionCensorExempt' array, usernames should be lowercase
+
+*/
+
 (function() {
     'use strict'
 
-    /**
-      Fix emote margins (fixes overlapping issues
-    */
-    let head = document.querySelector('head')
-    let style = document.createElement('style')
-    let css = `.chat-line__message--emote-button {
-        margin: 0 0 3px 0 !important;
-    }`
-    style.type = 'text/css'
-    style.appendChild(document.createTextNode(css))
-    head.appendChild(style)
+    let censorExempt = []
+    let mentionCensorExempt = []
 
     /**
       Element has class
@@ -66,6 +68,8 @@
       Main code, see Userscript description
     */
     document.addEventListener('click', el => {
+        if (el.ctrlKey) return // press ctrl to not snip
+
         let body = document.querySelector('body')
         let chat_list = document.querySelector('.chat-list__list-container')
         let chat = hasClassInTree(el.target, 'chat-line__message')
@@ -96,22 +100,25 @@
             let icons = chat.querySelector('span:not([class])')
             let existingStyle = chat.getAttribute('style')
 
-            mentions.forEach(mention => {
-                if (mention.classList.contains('mention-fragment--recipient')) {
-                  mention.setAttribute('style', 'color: rgb(255, 255, 255); background: rgb(255, 255, 255);')
-                } else {
-                  mention.setAttribute('style', 'color: rgb(50, 50, 57); background: rgb(50, 50, 57);')
-                }
-            })
+            if (!el.shiftKey) {
+                mentions.forEach(mention => {
+                    if (!mentionCensorExempt.includes(mention.textContent.toLowerCase().replace('@', ''))) {
+                        if (mention.classList.contains('mention-fragment--recipient')) {
+                            mention.setAttribute('style', 'color: rgb(255, 255, 255); background: rgb(255, 255, 255);')
+                        } else {
+                            mention.setAttribute('style', 'color: rgb(50, 50, 57); background: rgb(50, 50, 57);')
+                        }
+                    }
+                })
 
-            username.style.background = username.style.color
-            icons.setAttribute('style', `background: ${username.style.color}; padding-top: 15px; height: 0; display: inline-block; overflow: hidden; top: 3px; position: relative;`)
-            chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(24, 24, 27); z-index: 100; ${existingStyle}`)
-            if (chat.classList.contains('bttv-split-chat-alt-bg')) {
-                chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(31, 25, 37); z-index: 100; ${existingStyle}`)
-            }
-            if (chat.classList.contains('bttv-highlighted')) {
-                chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(94, 17, 19); z-index: 100; ${existingStyle}`)
+                if (!censorExempt.includes(username.textContent.toLowerCase())) {
+                    username.style.background = username.style.color
+                    icons.setAttribute('style', `background: ${username.style.color}; padding-top: 15px; height: 0; display: inline-block; overflow: hidden; top: 3px; position: relative;`)
+                }
+                chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(24, 24, 27) !important; background-image: rgb(24, 24, 27) !important; opacity: 1; z-index: 100; ${existingStyle}`)
+                if (chat.classList.contains('bttv-split-chat-alt-bg')) {
+                    chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(31, 25, 37)!important; background-image: rgb(31, 25, 37)!important; opacity: 1; z-index: 100; ${existingStyle}`)
+                }
             }
 
             chat_list.prepend(chat)
