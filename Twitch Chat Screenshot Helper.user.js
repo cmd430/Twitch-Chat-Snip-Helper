@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.5.1
+// @version      0.5.4
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -74,13 +74,16 @@
 
         let body = document.querySelector('body')
         let chat_list = document.querySelector('.chat-list__list-container').parentElement
-        let chat = hasClassInTree(el.target, 'chat-line__message')
-
+        let chat = hasClassInTree(el.target, 'ffz--points-highlight')
         if (chat === true) {
             chat = el.target
         }
+
         if (chat === null) {
-            chat = hasClassInTree(el.target, 'ffz--points-highlight')
+            chat = hasClassInTree(el.target, 'chat-line__message')
+            if (chat === true) {
+                chat = el.target
+            }
         }
 
         if (chat !== null) {
