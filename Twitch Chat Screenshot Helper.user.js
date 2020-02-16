@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.4.6
+// @version      0.5.1
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -22,8 +22,15 @@
 (function() {
     'use strict'
 
-    let censorExempt = []
-    let mentionCensorExempt = []
+    let censorExempt = [
+        'sweet_anita',
+        'steethebutcher',
+        'brandinio_'
+    ]
+    let mentionCensorExempt = [
+        'sweet_anita'
+    ]
+    censorExempt = censorExempt.concat(mentionCensorExempt)
 
     /**
       Element has class
@@ -71,7 +78,7 @@
         if (el.ctrlKey) return // press ctrl to not snip
 
         let body = document.querySelector('body')
-        let chat_list = document.querySelector('.chat-list__list-container')
+        let chat_list = document.querySelector('.chat-list__list-container').parentElement
         let chat = hasClassInTree(el.target, 'chat-line__message')
 
         if (chat === true) {
@@ -95,19 +102,15 @@
         if (chat !== null) {
             chat = chat.cloneNode(true)
 
-            let username = chat.querySelector('.chat-line__username span .chat-author__display-name')
-            let mentions = chat.querySelectorAll('.mention-fragment')
-            let icons = chat.querySelector('span:not([class])')
+            let username = chat.querySelector('.chat-line__username')
+            let mentions = chat.querySelectorAll('.chat-line__message-mention')
+            let icons = chat.querySelector('.chat-line__message--badges')
             let existingStyle = chat.getAttribute('style')
 
             if (!el.shiftKey) {
                 mentions.forEach(mention => {
                     if (!mentionCensorExempt.includes(mention.textContent.toLowerCase().replace('@', ''))) {
-                        if (mention.classList.contains('mention-fragment--recipient')) {
-                            mention.setAttribute('style', 'color: rgb(255, 255, 255); background: rgb(255, 255, 255);')
-                        } else {
-                            mention.setAttribute('style', 'color: rgb(50, 50, 57); background: rgb(50, 50, 57);')
-                        }
+                        mention.setAttribute('style', 'color: rgb(50, 50, 57); background: rgb(50, 50, 57); border-radius: 0; padding: 0;')
                     }
                 })
 
@@ -116,11 +119,9 @@
                     icons.setAttribute('style', `background: ${username.style.color}; padding-top: 15px; height: 0; display: inline-block; overflow: hidden; top: 3px; position: relative;`)
                 }
                 chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(24, 24, 27) !important; background-image: rgb(24, 24, 27) !important; opacity: 1; z-index: 100; ${existingStyle}`)
-                if (chat.classList.contains('bttv-split-chat-alt-bg')) {
-                    chat.setAttribute('style', `position: absolute; top: 0; width: 100%; background: rgb(31, 25, 37)!important; background-image: rgb(31, 25, 37)!important; opacity: 1; z-index: 100; ${existingStyle}`)
-                }
             }
 
+            chat.classList.add('ffz-custom-color')
             chat_list.prepend(chat)
 
             setTimeout(() => {
