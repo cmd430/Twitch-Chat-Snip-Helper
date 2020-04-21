@@ -114,6 +114,7 @@
                 chat.querySelector('[data-test-selector="chat-deleted-message-attribution"]').setAttribute('style', 'display: none !important;')
             } catch (err) {}
 
+
             chat.classList.add('ffz-custom-color')
             chat_list.prepend(chat)
 
