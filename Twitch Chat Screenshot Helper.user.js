@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Chat Screenshot Helper
 // @namespace    http://tampermonkey.net/
-// @version      0.5.4
+// @version      0.5.6
 // @description  Click chat msg on twitch, hides name and badges then opens 'Twitch Char Snip Helper' to get snip of chat on clipboard
 // @author       Bred
 // @match        https://*.twitch.tv/*
@@ -110,13 +110,18 @@
             }
             if (actions) actions.setAttribute('style', 'display: none !important;')
 
+            try {
+                chat.querySelector('[data-test-selector="chat-deleted-message-attribution"]').setAttribute('style', 'display: none !important;')
+            } catch (err) {}
+
+
             chat.classList.add('ffz-custom-color')
             chat_list.prepend(chat)
 
             setTimeout(() => {
                 let rect = chat.getBoundingClientRect()
                 let iframe = document.createElement('iframe')
-                iframe.src = `tcsh:${Math.round(rect.x)}:${Math.round(rect.y)}:${Math.round(rect.width)}:${Math.round(rect.height)}`
+                iframe.src = `tcsh:${Math.round(rect.x)}:${Math.round(rect.y)}:${Math.round(rect.width)}:${Math.round(rect.height)}:${screen.availHeight - innerHeight}:${screen.left}`
 
                 body.appendChild(iframe)
                 body.removeChild(iframe)
