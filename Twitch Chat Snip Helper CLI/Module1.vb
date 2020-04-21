@@ -7,21 +7,19 @@ Module Module1
     Sub Main(args As String())
         Try
             ' snip size / location
-            Dim x = args(0).Split(":"c)(1)
-            Dim y = args(0).Split(":"c)(2)
-            Dim width = args(0).Split(":"c)(3)
-            Dim height = args(0).Split(":"c)(4)
+            Dim args_split = args(0).Split(":"c)
+            Dim x = args_split(1)
+            Dim y = args_split(2)
+            Dim width = args_split(3)
+            Dim height = args_split(4)
             Dim size As New Size(width, height)
-
-
-            ' offset for firefox window location
-            Dim ff_top = 74
-            Dim ff_left = 1280
+            Dim bw_top = args_split(5)
+            Dim bw_left = args_split(6)
 
             ' take screenshot and copy to clipboard
             Using snip = New Bitmap(width, height, PixelFormat.Format32bppArgb)
                 Using graph = Graphics.FromImage(snip)
-                    graph.CopyFromScreen(x + ff_left, y + ff_top, 0, 0, size, CopyPixelOperation.SourceCopy)
+                    graph.CopyFromScreen(CType(x, Integer) + CType(bw_left, Integer), CType(y, Integer) + CType(bw_top, Integer), 0, 0, size, CopyPixelOperation.SourceCopy)
                 End Using
                 Clipboard.SetImage(snip)
             End Using
